@@ -23,17 +23,6 @@ public unsafe struct StackString128
     }
 
 
-    public unsafe Span<byte> Span
-    {
-        get
-        {
-            fixed (byte* ptr = &_element)
-                return new(ptr, SIZE);
-        }
-    }
-
-    public ref byte Bytes => ref MemoryMarshal.GetReference(Span);
-
 
     private byte _element;
 
@@ -42,15 +31,14 @@ public unsafe struct StackString128
         int requiredBytes = Encoding.UTF8.GetByteCount(str);
 
         if (requiredBytes > SIZE)
-            throw new IndexOutOfRangeException($"Input string exceeds 128 bytes of UTF8 characters!");
+            throw new IndexOutOfRangeException($"Input string exceeds {SIZE} bytes of UTF8 characters!");
 
-
-        fixed (byte* ptr = &_element)
-            Encoding.UTF8.GetBytes(str, Span);
+        
+        Encoding.UTF8.GetBytes(str, this.AsSpan());
     }
 
 
-    public static implicit operator string(StackString128 other) => Encoding.UTF8.GetString(other.Span);
+    public static implicit operator string(StackString128 other) => Encoding.UTF8.GetString(other.AsSpan());
     public static implicit operator StackString128(string other) => new(other);
 }
 
@@ -76,18 +64,6 @@ public unsafe struct StackString256
         }
     }
 
-    public unsafe Span<byte> Span
-    {
-        get
-        {
-            fixed (byte* ptr = &_element)
-                return new(ptr, SIZE);
-        }
-    }
-
-    public ref byte Bytes => ref MemoryMarshal.GetReference(Span);
-
-
     private byte _element;
 
     public unsafe StackString256(string str)
@@ -95,14 +71,21 @@ public unsafe struct StackString256
         int requiredBytes = Encoding.UTF8.GetByteCount(str);
 
         if (requiredBytes > SIZE)
-            throw new IndexOutOfRangeException($"Input string exceeds 128 bytes of UTF8 characters!");
+            throw new IndexOutOfRangeException($"Input string exceeds {SIZE} bytes of UTF8 characters!");
 
+        Span<byte> bytes = this.AsSpan();
 
-        fixed (byte* ptr = &_element)
-            Encoding.UTF8.GetBytes(str, Span);
+        Encoding.UTF8.GetBytes(str, bytes);
     }
 
 
-    public static implicit operator string(StackString256 other) => Encoding.UTF8.GetString(other.Span);
+    public static implicit operator string(StackString256 other) => Encoding.UTF8.GetString(other.AsSpan());
     public static implicit operator StackString256(string other) => new(other);
+}
+
+
+public static class StackStringHelpers
+{
+    public static Span<byte> AsSpan(this ref StackString128 str) => MemoryMarshal.Cast<StackString128, byte>(new Span<StackString128>(ref str));
+    public static Span<byte> AsSpan(this ref StackString256 str) => MemoryMarshal.Cast<StackString256, byte>(new Span<StackString256>(ref str));
 }
