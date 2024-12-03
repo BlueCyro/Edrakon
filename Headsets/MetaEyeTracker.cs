@@ -1,4 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Edrakon.Helpers;
+using Edrakon.Logging;
 using Edrakon.Wrappers;
 using Silk.NET.Core;
 using Silk.NET.OpenXR;
@@ -7,64 +12,72 @@ namespace Edrakon.Headsets;
 
 public class MetaEyeTracker : IDisposable
 {
+    public Action<object?, int>? Logger;
+
+    public const string EYE_INTERACTION_PROFILE = "/interaction_profiles/ext/eye_gaze_interaction";
+    public const string EYE_ACTION_PATH         = "/user/eyes_ext/input/gaze_ext/pose";
+
+
     public readonly XRInstance Instance;
     public readonly XRSession Session;
     public readonly XRSpace Space;
+    public readonly XRSpace ViewSpace;
+    public readonly XRActionSet Actions;
+    public readonly XRAction<PosefAction> EyeAction;
 
 
-    private readonly PtrFuncTyped<XrCreateEyeTrackerFB> xrCreateEyeTrackerFB;
-    private readonly PtrFuncTyped<XrDestroyEyeTrackerFB> xrDestroyEyeTrackerFB;
-    private readonly PtrFuncTyped<XrGetEyeGazesFB> xrGetEyeGazesFB;
 
-
-    private readonly EyeTrackerFB eyeTracker;
-
-
+    private Posef lastGaze;
 
     public MetaEyeTracker(XRInstance instance, XRSession session)
     {
-        xrCreateEyeTrackerFB = instance.GetXRFunction<XrCreateEyeTrackerFB>(nameof(xrCreateEyeTrackerFB));
-        xrDestroyEyeTrackerFB = instance.GetXRFunction<XrDestroyEyeTrackerFB>(nameof(xrDestroyEyeTrackerFB));
-        xrGetEyeGazesFB = instance.GetXRFunction<XrGetEyeGazesFB>(nameof(xrGetEyeGazesFB));
+        // if (!instance.SupportsEyeTracking())
+        //     throw new NotSupportedException($"Eye tracking for this device isn't supported on the current OpenXR runtime.");
 
 
         Instance = instance;
         Session = session;
-        Space = session.CreateReferenceSpace();
+        ViewSpace = session.CreateReferenceSpace(spaceType: ReferenceSpaceType.View);
+        Actions = instance.CreateActionSet("edrakon", "Edrakon");
+        EyeAction = Actions.CreateAction<PosefAction>("eye_gaze", "Eye Gaze");
+        Space = EyeAction.CreateSpace(session);
 
+        instance.SuggestInteractionProfileBindings(
+            EYE_INTERACTION_PROFILE,
+            [
+                new(EyeAction, EYE_ACTION_PATH)
+            ]);
 
-        if (!instance.SupportsEyeTracking())
-            throw new NotSupportedException($"Eye tracking for this device isn't supported on the current OpenXR runtime.");
-
-        EyeTrackerCreateInfoFB eyeCreateInfo = XRHelpers.GetPropertyStruct<EyeTrackerCreateInfoFB>();
-        xrCreateEyeTrackerFB.Call(session.session, ref eyeCreateInfo, ref eyeTracker).ThrowIfNotSuccess();
+        session.AttachActionSets(Actions);
     }
 
 
-    public void GetEyeGazes(out EyeGazeFB left, out EyeGazeFB right)
+    public bool GetEyeGazes(out Posef eyes)
     {
-        EyeGazesInfoFB eyeGazeInfo = XRHelpers.GetPropertyStruct<EyeGazesInfoFB>();
-        eyeGazeInfo.BaseSpace = Space.Space;
-        eyeGazeInfo.Time = Session.WaitFrame().PredictedDisplayTime;
+        long time = Instance.Time;
+        SpaceLocation spaceLocation = Space.LocateSpace(ViewSpace, time);
+        SpaceLocationFlags flags = spaceLocation.LocationFlags;
 
-        EyeGazesFB gazes = XRHelpers.GetPropertyStruct<EyeGazesFB>();
-        xrGetEyeGazesFB.Call(eyeTracker, ref eyeGazeInfo, ref gazes).ThrowIfNotSuccess();
+        bool isValid = flags.HasFlag(SpaceLocationFlags.OrientationValidBit) && flags.HasFlag(SpaceLocationFlags.PositionValidBit);
 
-        
-        left = gazes.Gaze.Element0;
-        right = gazes.Gaze.Element1;
+        if (!isValid)
+        {
+            Log($"Eye transforms are not valid: {flags}", 1);
+            eyes = lastGaze;
+            return false;
+        }
+
+        // Log($"Time: {time}, Pose: (Position: {spaceLocation.Pose.Position.ToNumeric()}, Rotation: {spaceLocation.Pose.Orientation.ToNumeric()})");
+        eyes = spaceLocation.Pose;
+        lastGaze = eyes;
+        return true;
     }
 
+    private void Log(object? message = null, int logLevel = 0) => Logger?.Invoke(message, logLevel);
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-
-        xrDestroyEyeTrackerFB.Call(eyeTracker);
-
-        xrCreateEyeTrackerFB.Dispose();
-        xrDestroyEyeTrackerFB.Dispose();
-        xrGetEyeGazesFB.Dispose();
     }
 }
 
