@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using KoboldOSC;
+using KoboldOSC.Messages;
 
 namespace Edrakon.Headsets;
 
@@ -18,6 +18,7 @@ public readonly struct SteamLinkParameters : IParameterStruct
         BundleCount = PathInfo.Select(info => info.BundleId).Where(id => id != -1).Distinct().Count();
     }
 
+    #region Bundle Zero
 
     [OSCInfo("sl/eyeTrackedGazePoint", 0)]
     public readonly Vector3 EyeTrackedGazePoint;
@@ -64,9 +65,9 @@ public readonly struct SteamLinkParameters : IParameterStruct
     [OSCInfo("/tracking/eye/EyesClosedAmount", 0)]
     public readonly float EyesClosedAmount;
 
+    #endregion
 
-
-
+    #region Bundle One
 
     [OSCInfo("/sl/xrfb/facec/LowerFace", 1)]
     public readonly float LowerFace;
@@ -137,10 +138,10 @@ public readonly struct SteamLinkParameters : IParameterStruct
     [OSCInfo("/sl/xrfb/facew/EyesLookUpL", 1)]
     public readonly float EyesLookUpL;
 
+    #endregion
 
 
-
-
+    #region Bundle Two
 
     [OSCInfo("/sl/xrfb/facew/EyesLookUpR", 2)]
     public readonly float EyesLookUpR;
@@ -202,9 +203,9 @@ public readonly struct SteamLinkParameters : IParameterStruct
     [OSCInfo("/sl/xrfb/facew/LipPuckerL", 2)]
     public readonly float LipPuckerL;
 
+    #endregion
 
-
-    
+    #region Bundle Three
 
     [OSCInfo("/sl/xrfb/facew/LipPuckerR", 3)]
     public readonly float LipPuckerR;
@@ -272,9 +273,9 @@ public readonly struct SteamLinkParameters : IParameterStruct
     [OSCInfo("/sl/xrfb/facew/UpperLipRaiserR", 3)]
     public readonly float UpperLipRaiserR;
 
+    #endregion
 
-
-
+    #region Bundle Four
 
     [OSCInfo("/sl/xrfb/facew/TongueTipInterdental", 4)]
     public readonly float TongueTipInterdental;
@@ -296,6 +297,8 @@ public readonly struct SteamLinkParameters : IParameterStruct
 
     [OSCInfo("/sl/xrfb/facew/TongueRetreat", 4)]
     public readonly float TongueRetreat;
+
+    #endregion
 }
 
 
@@ -303,7 +306,7 @@ public readonly struct SteamLinkParameters : IParameterStruct
 [AttributeUsage(AttributeTargets.Field)]
 public class OSCInfoAttribute(string path, int bundleId = -1) : Attribute
 {
-    public readonly OSCInfo Info = new();
+    public readonly OSCInfo Info = new(path, bundleId);
 }
 
 
