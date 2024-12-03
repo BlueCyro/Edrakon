@@ -1,5 +1,6 @@
 using System.Numerics;
 using Edrakon.Helpers;
+using Edrakon.Structs;
 using Silk.NET.OpenXR;
 
 namespace Edrakon.Wrappers;
@@ -52,6 +53,47 @@ public class XRSession : IDisposable
         
         return new(XR, this, position, orientation, spaceType);
     }
+
+
+
+    public unsafe void AttachActionSets(params Span<XRActionSet> actionSets)
+    {
+        SessionActionSetsAttachInfo attachInfo = XRHelpers.GetPropertyStruct<SessionActionSetsAttachInfo>();
+
+        Span<ActionSet> sets = stackalloc ActionSet[actionSets.Length];
+
+        for (int i = 0; i < actionSets.Length; i++)
+            sets[i] = actionSets[i].actionSet;
+
+
+        fixed (ActionSet* setsPtr = sets)
+        {
+            attachInfo.ActionSets = setsPtr;
+            attachInfo.CountActionSets = (uint)actionSets.Length;
+            XR.AttachSessionActionSets(session, ref attachInfo);
+        }
+    }
+
+    public ActionStatePose GetActionStatePose(XRAction<PosefAction> action, string? subPath = null)
+    {
+        ActionStateGetInfo getInfo = XRHelpers.GetPropertyStruct<ActionStateGetInfo>();
+
+        unsafe
+        {
+            if (subPath != null)
+            {
+                StackString256 subPathBytes = new(subPath);
+                getInfo.SubactionPath = (ulong)&subPathBytes;
+            }
+        }
+
+        ActionStatePose pose = XRHelpers.GetPropertyStruct<ActionStatePose>();
+        XR.GetActionStatePose(session, ref getInfo, ref pose).ThrowIfNotSuccess($"Could not get action state for '{action.Name}'");
+
+        return pose;
+    }
+
+
 
     public void Dispose()
     {
