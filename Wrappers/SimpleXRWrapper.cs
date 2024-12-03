@@ -105,7 +105,7 @@ public class SimpleXRWrapper
 
 
         Instance instance = new();
-        xr.CreateInstance(in createInfo, ref instance);
+        xr.CreateInstance(in createInfo, ref instance).ThrowIfNotSuccess("Failed to initialize OpenXR instance.");
         XRInstance instanceWrapper = new(xr, instance);
 
         return instanceWrapper;
