@@ -74,10 +74,6 @@ public class MetaFaceTracker : IDisposable
             }
         }
 
-        // Blow up if it's not valid.
-        // if (!(Bool32)expressionWeights.IsValid)
-        //     throw new InvalidDataException($"Expression weights were not valid!!!");
-        
         return ref faceInfo;
     }
 

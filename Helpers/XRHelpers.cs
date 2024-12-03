@@ -135,11 +135,3 @@ public static class TransformHelpers
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Quaternionf ToSilk(this Quaternion other) => Unsafe.As<Quaternion, Quaternionf>(ref other);
 }
-
-public enum ClockType : int
-{
-    Realtime,
-    Monotonic,
-    ProcessCpuTimeId,
-    ThreadCpuTimeId
-}
