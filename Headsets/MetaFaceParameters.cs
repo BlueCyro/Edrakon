@@ -1,5 +1,6 @@
 using System.Numerics;
 using KoboldOSC;
+using KoboldOSC.Messages;
 
 namespace Edrakon.Headsets;
 
@@ -85,69 +86,18 @@ public struct MetaFaceParameters : IParameterStruct
     public readonly float TongueBackDorsalVelarFB;
     public readonly float TongueOutFB;
     public readonly float TongueRetreatFB;
+}
 
 
-    public readonly void Serialize(Span<KOscBundle> bundles)
-    {
-        #region Eye Look
-        KOscMessage eyeTrackedGazePoint = new("/sl/eyeTrackedGazePoint");
-        eyeTrackedGazePoint.WriteVector(default);
-
-        float leftX = EyesLookLeftLFB - EyesLookRightLFB;
-        KOscMessage leftEyeX = new("/avatar/parameters/LeftEyeX");
-        leftEyeX.WriteFloat(leftX);
-
-        float leftY = EyesLookUpLFB - EyesLookDownLFB;
-        KOscMessage leftEyeY = new("/avatar/parameters/LeftEyeY");
-        leftEyeY.WriteFloat(leftY);
-
-        float rightX = EyesLookLeftRFB - EyesLookRightRFB;
-        KOscMessage rightEyeX = new("/avatar/parameters/RightEyeX");
-        rightEyeX.WriteFloat(rightX);
-
-        float rightY = EyesLookUpRFB - EyesLookDownRFB;
-        KOscMessage rightEyeY = new("/avatar/parameters/RightEyeY");
-        rightEyeY.WriteFloat(rightY);
-
-        Vector3 centerVec = new((leftX + rightX) / 2, (leftY + rightY) / 2, 0);
-        KOscMessage centerVecFull = new("/tracking/eye/CenterVecFull");
-        centerVecFull.WriteVector(in centerVec);
-
-        #endregion
+public readonly struct MetaFaceInfo
+{
+    public readonly MetaFaceParameters FaceParameters;
+    public readonly MetaFaceConfidences FaceConfidences;
+}
 
 
-        #region Eye lids
-
-        KOscMessage rightEyeLid =  new("/avatar/parameters/RightEyeLid");
-        rightEyeLid.WriteFloat(EyesClosedRFB);
-
-        KOscMessage rightEyeLidExpandedSqueeze =  new("/avatar/parameters/RightEyeLidExpandedSqueeze");
-        rightEyeLidExpandedSqueeze.WriteFloat(UpperLidRaiserRFB);
-
-        KOscMessage rightEyeSqueezeToggle =  new("/avatar/parameters/RightEyeSqueezeToggle");
-        rightEyeSqueezeToggle.WriteFloat(0f);
-
-        KOscMessage rightEyeWidenToggle =  new("/avatar/parameters/RightEyeWidenToggle");
-        rightEyeWidenToggle.WriteInt(UpperLidRaiserRFB > 0f ? 1 : 0);
-
-        KOscMessage leftEyeLid =  new("/avatar/parameters/LeftEyeLid");
-        leftEyeLid.WriteFloat(EyesClosedLFB);
-
-        KOscMessage leftEyeLidExpandedSqueeze =  new("/avatar/parameters/LeftEyeLidExpandedSqueeze");
-        leftEyeLidExpandedSqueeze.WriteFloat(UpperLidRaiserLFB);
-
-        KOscMessage leftEyeSqueezeToggle =  new("/avatar/parameters/LeftEyeSqueezeToggle");
-        leftEyeSqueezeToggle.WriteFloat(0f);
-
-        KOscMessage leftEyeWidenToggle =  new("/avatar/parameters/LeftEyeWidenToggle");
-        leftEyeWidenToggle.WriteFloat(UpperLidRaiserLFB > 0 ? 1 : 0);
-
-        KOscMessage eyesClosedAmount =  new("/tracking/eye/EyesClosedAmount");
-        eyesClosedAmount.WriteFloat(Math.Max(EyesClosedLFB, EyesClosedRFB));
-
-
-        #endregion
-
-        bundles[0] = new(eyeTrackedGazePoint, leftEyeX, leftEyeY, rightEyeX, rightEyeY, centerVecFull, rightEyeLid, leftEyeLid);
-    }
+public readonly struct MetaFaceConfidences
+{
+    public readonly float Lower;
+    public readonly float Upper;
 }

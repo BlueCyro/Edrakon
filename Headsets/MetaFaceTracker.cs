@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Reflection;
 using Edrakon.Helpers;
-using KoboldOSC;
+using KoboldOSC.Messages;
 using KoboldOSC.Structs;
 using Edrakon.Wrappers;
 using Silk.NET.Core;
@@ -18,24 +18,30 @@ public class MetaFaceTracker : IDisposable
     public static readonly int ExpressionCount = Enum.GetValues<FaceExpression2FB>().Cast<FaceExpression2FB>().Distinct().Count();
 
 
-    private readonly PtrFuncTyped<XrCreateFaceTracker2FB> xrCreateFaceTracker2FB;
-    private readonly PtrFuncTyped<XrDestroyFaceTracker2FB> xrDestroyFaceTracker2FB;
-    private readonly PtrFuncTyped<XrGetFaceExpressionWeights2FB> xrGetFaceExpressionWeights2FB;
+    private PtrFuncTyped<XrCreateFaceTracker2FB> xrCreateFaceTracker2FB;
+    private PtrFuncTyped<XrDestroyFaceTracker2FB> xrDestroyFaceTracker2FB;
+    private PtrFuncTyped<XrGetFaceExpressionWeights2FB> xrGetFaceExpressionWeights2FB;
     
 
-    private readonly FaceTracker2FB tracker;
-    private MetaFaceParameters weights;
+    private FaceTracker2FB tracker;
+    private MetaFaceInfo faceInfo;
     private FaceExpressionInfo2FB expressionInfo = XRHelpers.GetPropertyStruct<FaceExpressionInfo2FB>();
 
 
     public MetaFaceTracker(XRInstance instance, XRSession session)
     {
-        xrCreateFaceTracker2FB = instance.GetXRFunction<XrCreateFaceTracker2FB>(nameof(xrCreateFaceTracker2FB));
-        xrDestroyFaceTracker2FB = instance.GetXRFunction<XrDestroyFaceTracker2FB>(nameof(xrDestroyFaceTracker2FB));
-        xrGetFaceExpressionWeights2FB = instance.GetXRFunction<XrGetFaceExpressionWeights2FB>(nameof(xrGetFaceExpressionWeights2FB));
-
         Instance = instance;
         Session = session;
+    }
+
+
+    public void Initialize()
+    {
+        xrCreateFaceTracker2FB = Instance.GetXRFunction<XrCreateFaceTracker2FB>(nameof(xrCreateFaceTracker2FB));
+        xrDestroyFaceTracker2FB = Instance.GetXRFunction<XrDestroyFaceTracker2FB>(nameof(xrDestroyFaceTracker2FB));
+        xrGetFaceExpressionWeights2FB = Instance.GetXRFunction<XrGetFaceExpressionWeights2FB>(nameof(xrGetFaceExpressionWeights2FB));
+
+
 
         FaceTrackerCreateInfo2FB faceTrackerInfo = XRHelpers.GetPropertyStruct<FaceTrackerCreateInfo2FB>();
         FaceTrackingDataSource2FB dataSource = FaceTrackingDataSource2FB.VisualFB;  // Only support visual right now.
@@ -43,15 +49,14 @@ public class MetaFaceTracker : IDisposable
         faceTrackerInfo.RequestedDataSourceCount = 1;
         unsafe { faceTrackerInfo.RequestedDataSources = &dataSource; }              // Pass in data source by ref (technically an array of 1 value)
 
-        xrCreateFaceTracker2FB.Call(session.session, ref faceTrackerInfo, ref tracker).ThrowIfNotSuccess();
+        xrCreateFaceTracker2FB.Call(Session.session, ref faceTrackerInfo, ref tracker).ThrowIfNotSuccess();
     }
 
 
-    public ref MetaFaceParameters GetBlendshapes()
+    public ref MetaFaceInfo GetBlendshapes()
     {
         // Init expression weights
         FaceExpressionWeights2FB expressionWeights = XRHelpers.GetPropertyStruct<FaceExpressionWeights2FB>();
-        expressionInfo.Time = Session.WaitFrame().PredictedDisplayTime;
 
         // Set the weight count and confidence count.
         expressionWeights.WeightCount = (uint)ExpressionCount;
@@ -59,23 +64,21 @@ public class MetaFaceTracker : IDisposable
 
         unsafe
         {
-            // Confidences aren't used here so just allocate on the stack and let the stack frame eat it. Yummy.
-            float* confidences = stackalloc float[ExpressionCount];
-            expressionWeights.Confidences = confidences;
-
             // Populate the weights field with a pointer to the span and get the face blendshapes.
-            fixed (MetaFaceParameters* weightsPtr = &weights)
+            fixed (MetaFaceConfidences* confPtr = &faceInfo.FaceConfidences)
+            fixed (MetaFaceParameters* weightsPtr = &faceInfo.FaceParameters)
             {
                 expressionWeights.Weights = (float*)weightsPtr;
+                expressionWeights.Confidences = (float*)confPtr;
                 xrGetFaceExpressionWeights2FB.Call(tracker, ref expressionInfo, ref expressionWeights).ThrowIfNotSuccess("Failed to get expression weights.");
             }
         }
 
         // Blow up if it's not valid.
-        if (!(Bool32)expressionWeights.IsValid)
-            throw new InvalidDataException($"Expression weights were not valid!!!");
+        // if (!(Bool32)expressionWeights.IsValid)
+        //     throw new InvalidDataException($"Expression weights were not valid!!!");
         
-        return ref weights;
+        return ref faceInfo;
     }
 
     
