@@ -11,7 +11,7 @@ namespace Edrakon.Wrapper;
 public abstract class XRPropertyBase<T> : IXRPropertyBase
     where T : unmanaged
 {
-    public StructureType StructureType => XRHelpers.StructureTypeLookup[typeof(T)];
+    public StructureType StructureType => Unsafe.As<T, StructureType>(ref properties);
     protected unsafe T properties = XRHelpers.GetPropertyStruct<T>();
     protected SystemProperties sysProps;
 
