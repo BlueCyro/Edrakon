@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Edrakon", "Edrakon.csproj",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoboldOSC", "..\KoboldOSC\KoboldOSC.csproj", "{49C3EECD-101E-4168-958C-EFEA5FCFE1AB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generators", "Generators", "{ECB47301-69F0-4493-8F25-115199961CFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenXRStructTypeGenerator", "Generators\OpenXRStructTypeGenerator\OpenXRStructTypeGenerator.csproj", "{99957203-B33E-46D7-9F06-7BE314C9A97C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +25,18 @@ Global
 		{49C3EECD-101E-4168-958C-EFEA5FCFE1AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49C3EECD-101E-4168-958C-EFEA5FCFE1AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49C3EECD-101E-4168-958C-EFEA5FCFE1AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99957203-B33E-46D7-9F06-7BE314C9A97C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99957203-B33E-46D7-9F06-7BE314C9A97C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99957203-B33E-46D7-9F06-7BE314C9A97C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99957203-B33E-46D7-9F06-7BE314C9A97C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B2CEEE0-D7A7-48C9-8D2A-D459D5300A60}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{99957203-B33E-46D7-9F06-7BE314C9A97C} = {ECB47301-69F0-4493-8F25-115199961CFB}
 	EndGlobalSection
 EndGlobal

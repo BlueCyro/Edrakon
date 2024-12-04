@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,16 +7,28 @@
     <Nullable>enable</Nullable>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PublishAot>true</PublishAot>
+    <!-- <PublishAot>true</PublishAot> -->
+    <!-- <OptimizationPreference>Speed</OptimizationPreference> -->
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath> -->
+    <StripSymbols>true</StripSymbols>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Silk.NET.OpenXR" Version="2.22.0" />
     <PackageReference Include="Spectre.Console" Version="0.49.1" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="./Generators/**/*" />
+    <Compile Remove="./Generated/**/*" />
+    <Compile Remove="./Dummies.cs" Condition="'$(PublishProfile)' == 'Default'"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../KoboldOSC/KoboldOSC.csproj" />
+    <ProjectReference Include="./Generators/OpenXRStructTypeGenerator/OpenXRStructTypeGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
-
 </Project>
