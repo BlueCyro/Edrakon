@@ -17,7 +17,7 @@ public static partial class XRHelpers
 
     public static unsafe Result GetExtensions(this XR xr, ref uint count, Span<ExtensionProperties> props) => xr.EnumerateInstanceExtensionProperties((byte*)null, ref count, props);
 
-    public static partial T GetPropertyStruct<T>() where T : unmanaged;
+    // public static partial T GetPropertyStruct<T>() where T : unmanaged;
 
     public static void ThrowIfNotSuccess(this Result result, string? message = null)
     {

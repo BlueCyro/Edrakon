@@ -37,7 +37,7 @@ public class SimpleXRWrapper
             uint count = ExtensionCount;
             Span<ExtensionProperties> extProps = stackalloc ExtensionProperties[(int)count];
             for (int i = 0; i < count; i++)
-                extProps[i] = XRHelpers.GetPropertyStruct<ExtensionProperties>();
+                extProps[i] = XRStructHelper<ExtensionProperties>.Get();
 
             xr.GetExtensions(ref count, extProps).ThrowIfNotSuccess("Failed to retrieve available OpenXR extensions.");
 

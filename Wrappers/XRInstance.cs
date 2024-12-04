@@ -95,7 +95,7 @@ public class XRInstance : IDisposable
 
     public unsafe void SuggestInteractionProfileBindings(string profile, XRActionSuggestedBinding[] bindings)
     {
-        InteractionProfileSuggestedBinding info = XRHelpers.GetPropertyStruct<InteractionProfileSuggestedBinding>();
+        InteractionProfileSuggestedBinding info = XRStructHelper<InteractionProfileSuggestedBinding>.Get();
 
 
         ActionSuggestedBinding* actionBindings = stackalloc ActionSuggestedBinding[bindings.Length];

@@ -21,8 +21,8 @@ public class XRSystem
     public uint MaxSwapchainHeight => sysProps.GraphicsProperties.MaxSwapchainImageHeight;
 
 
-    internal SystemGetInfo sysInfo = XRHelpers.GetPropertyStruct<SystemGetInfo>();
-    internal SystemProperties sysProps = XRHelpers.GetPropertyStruct<SystemProperties>();
+    internal SystemGetInfo sysInfo = XRStructHelper<SystemGetInfo>.Get();
+    internal SystemProperties sysProps = XRStructHelper<SystemProperties>.Get();
     internal ulong sysID;
     internal readonly XRInstance instance;
 

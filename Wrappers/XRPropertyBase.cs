@@ -1,5 +1,3 @@
-
-
 using System.Runtime.CompilerServices;
 using Edrakon.Helpers;
 using Edrakon.Wrappers;
@@ -12,7 +10,7 @@ public abstract class XRPropertyBase<T> : IXRPropertyBase
     where T : unmanaged
 {
     public StructureType StructureType => Unsafe.As<T, StructureType>(ref properties);
-    protected unsafe T properties = XRHelpers.GetPropertyStruct<T>();
+    protected unsafe T properties = XRStructHelper<T>.Get();
     protected SystemProperties sysProps;
 
 

@@ -71,30 +71,35 @@ public static class Helpers
         return $@"
 namespace Edrakon.Helpers;
 
-public static partial class XRHelpers
+#pragma warning disable CS0618 // Disable obsolete warning
+public static partial class XRStructHelper<T> where T : unmanaged
 {{
-    public static partial T GetPropertyStruct<T>() where T : unmanaged
-    {{
-        T newType = new();
+    private static readonly T propStruct;
 
-        switch (newType)
+    static XRStructHelper()
+    {{
+        propStruct = new();
+        switch (propStruct)
         {{
 {string.Join("\n\n", StructureLookups.Select(lookup =>
 {
     string typeName = $"global::Silk.NET.OpenXR.{lookup.Key}";
     string label = $"new{lookup.Key}";
+    string structureType = $"global::Silk.NET.OpenXR.StructureType.{lookup.Value}";
 
     return $@"
-            case {typeName} {label}:
-                {label}.Type = global::Silk.NET.OpenXR.StructureType.{lookup.Value};
-                return global::System.Runtime.CompilerServices.Unsafe.As<{typeName}, T>(ref {label});
+            case {typeName}:
+                global::System.Runtime.CompilerServices.Unsafe.As<T, global::Silk.NET.OpenXR.StructureType>(ref propStruct) = {structureType};
+                break;
 ";}))}
             default:
                 throw new NotImplementedException($""Could not get unimplemented property struct: {{typeof(T)}}"");
 
         }}
     }}
+    public static partial T Get() => propStruct;
 }}
+#pragma warning restore CS0618 // Restore obsolete warning
 ";
     }
 

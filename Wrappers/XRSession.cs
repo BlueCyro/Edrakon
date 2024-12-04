@@ -16,14 +16,14 @@ public class XRSession : IDisposable
     {
         XR = xr;
         Instance = instance;
-        SessionCreateInfo seshInfo = XRHelpers.GetPropertyStruct<SessionCreateInfo>();
+        SessionCreateInfo seshInfo = XRStructHelper<SessionCreateInfo>.Get();
         seshInfo.SystemId = system.SysID;
         xr.CreateSession(instance.instance, ref seshInfo, ref session);
     }
 
     public void Begin(ViewConfigurationType viewConfigurationType = ViewConfigurationType.None)
     {
-        SessionBeginInfo beginInfo = XRHelpers.GetPropertyStruct<SessionBeginInfo>();
+        SessionBeginInfo beginInfo = XRStructHelper<SessionBeginInfo>.Get();
         beginInfo.PrimaryViewConfigurationType = viewConfigurationType;
 
         XR.BeginSession(session, ref beginInfo);
@@ -34,7 +34,7 @@ public class XRSession : IDisposable
 
     public unsafe FrameState WaitFrame()
     {
-        FrameState frameState = XRHelpers.GetPropertyStruct<FrameState>();
+        FrameState frameState = XRStructHelper<FrameState>.Get();
 
         // FrameWaitInfo is ALWAYS null currently. This is for extensibility purposes.
         XR.WaitFrame(session, (FrameWaitInfo*)null, ref frameState).ThrowIfNotSuccess();
@@ -58,7 +58,7 @@ public class XRSession : IDisposable
 
     public unsafe void AttachActionSets(params Span<XRActionSet> actionSets)
     {
-        SessionActionSetsAttachInfo attachInfo = XRHelpers.GetPropertyStruct<SessionActionSetsAttachInfo>();
+        SessionActionSetsAttachInfo attachInfo = XRStructHelper<SessionActionSetsAttachInfo>.Get();
 
         Span<ActionSet> sets = stackalloc ActionSet[actionSets.Length];
 
@@ -76,7 +76,7 @@ public class XRSession : IDisposable
 
     public ActionStatePose GetActionStatePose(XRAction<PosefAction> action, string? subPath = null)
     {
-        ActionStateGetInfo getInfo = XRHelpers.GetPropertyStruct<ActionStateGetInfo>();
+        ActionStateGetInfo getInfo = XRStructHelper<ActionStateGetInfo>.Get();
 
         unsafe
         {
@@ -87,7 +87,7 @@ public class XRSession : IDisposable
             }
         }
 
-        ActionStatePose pose = XRHelpers.GetPropertyStruct<ActionStatePose>();
+        ActionStatePose pose = XRStructHelper<ActionStatePose>.Get();
         XR.GetActionStatePose(session, ref getInfo, ref pose).ThrowIfNotSuccess($"Could not get action state for '{action.Name}'");
 
         return pose;

@@ -9,7 +9,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- <PublishAot>true</PublishAot> -->
     <!-- <OptimizationPreference>Speed</OptimizationPreference> -->
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <!-- <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath> -->
     <StripSymbols>true</StripSymbols>

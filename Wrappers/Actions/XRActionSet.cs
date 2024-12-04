@@ -18,7 +18,7 @@ public class XRActionSet
         XR = xr;
         Instance = inst;
 
-        ActionSetCreateInfo info = XRHelpers.GetPropertyStruct<ActionSetCreateInfo>();
+        ActionSetCreateInfo info = XRStructHelper<ActionSetCreateInfo>.Get();
 
 
         unsafe

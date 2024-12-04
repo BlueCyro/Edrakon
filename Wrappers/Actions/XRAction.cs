@@ -27,7 +27,7 @@ public class XRAction<T> : IXRAction
         Name = name;
         LocalizedName = name;
 
-        ActionCreateInfo info = XRHelpers.GetPropertyStruct<ActionCreateInfo>();
+        ActionCreateInfo info = XRStructHelper<ActionCreateInfo>.Get();
 
 
         unsafe
