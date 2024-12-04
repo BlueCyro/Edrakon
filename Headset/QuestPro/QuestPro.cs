@@ -150,7 +150,8 @@ public class QuestPro(int port) : IDisposable
     {
         ThrowIfDisposed();
 
-        #region Eye Look
+        #region Gaze Vector
+
         float leftX = faceInfo.FaceParameters.EyesLookLeftLFB - faceInfo.FaceParameters.EyesLookRightLFB;
         float leftY = faceInfo.FaceParameters.EyesLookUpLFB - faceInfo.FaceParameters.EyesLookDownLFB;
         float rightX = faceInfo.FaceParameters.EyesLookLeftRFB - faceInfo.FaceParameters.EyesLookRightRFB;
@@ -176,7 +177,7 @@ public class QuestPro(int port) : IDisposable
         #endregion
 
 
-        #region Eye lids
+        #region Bundle 1
 
         KOscMessage rightEyeLid =  new("/avatar/parameters/RightEyeLid");
         rightEyeLid.WriteFloat(faceInfo.FaceParameters.EyesClosedRFB);
@@ -197,7 +198,7 @@ public class QuestPro(int port) : IDisposable
         KOscMessage eyesClosedAmount =  new("/tracking/eye/EyesClosedAmount");
         eyesClosedAmount.WriteFloat(Math.Max(faceInfo.FaceParameters.EyesClosedLFB, faceInfo.FaceParameters.EyesClosedRFB));
 
-        #endregion
+
 
 
         KOscBundle bundle1 = new(
@@ -217,7 +218,10 @@ public class QuestPro(int port) : IDisposable
             leftEyeWidenToggle,
             eyesClosedAmount);
 
-        
+        #endregion
+
+
+        #region Bundle 2
 
         KOscMessage lowerFaceC = new("/sl/xrfb/facec/LowerFace");
         lowerFaceC.WriteFloat(faceInfo.FaceConfidences.Lower);
@@ -291,7 +295,9 @@ public class QuestPro(int port) : IDisposable
             eyesLookRightR,
             eyesLookUpL);
 
-        
+        #endregion
+
+        #region Bundle 3
 
         KOscMessage eyesLookUpR = new("/sl/xrfb/facew/EyesLookUpR");
         eyesLookUpR.WriteFloat(faceInfo.FaceParameters.EyesLookUpRFB);
@@ -356,7 +362,9 @@ public class QuestPro(int port) : IDisposable
             lipPressorR,
             lipPuckerL);
 
+        #endregion
 
+        #region Bundle 4
 
         KOscMessage lipPuckerR = new("/sl/xrfb/facew/LipPuckerR");
         lipPuckerR.WriteFloat(faceInfo.FaceParameters.LipPuckerRFB);
@@ -427,8 +435,9 @@ public class QuestPro(int port) : IDisposable
             upperLipRaiserL,
             upperLipRaiserR);
         
-        
+        #endregion
 
+        #region Bundle 5
 
         KOscMessage tongueTipInterdental = new("/sl/xrfb/facew/TongueTipInterdental");
         tongueTipInterdental.WriteFloat(faceInfo.FaceParameters.TongueTipInterdentalFB);
@@ -455,8 +464,10 @@ public class QuestPro(int port) : IDisposable
             tongueOut,
             tongueRetreat);
 
+        #endregion
+
+        // Sending bundles will eventually dispose of them, so it's fine to forego explicit disposal of each message/bundle.
         sender.Send(bundle1, bundle2, bundle3, bundle4, bundle5);
-        // bundle.Dispose();
     }
 
 

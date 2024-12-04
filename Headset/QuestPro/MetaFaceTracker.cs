@@ -19,7 +19,7 @@ public class MetaFaceTracker : IDisposable
     private PtrFuncTyped<XrCreateFaceTracker2FB> xrCreateFaceTracker2FB;
     private PtrFuncTyped<XrDestroyFaceTracker2FB> xrDestroyFaceTracker2FB;
     private PtrFuncTyped<XrGetFaceExpressionWeights2FB> xrGetFaceExpressionWeights2FB;
-    
+
 
     private FaceTracker2FB tracker;
     private MetaFaceInfo faceInfo;
