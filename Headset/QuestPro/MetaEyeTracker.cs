@@ -1,11 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Edrakon.Helpers;
-using Edrakon.Logging;
+using Edrakon.Structs;
 using Edrakon.Wrappers;
-using Silk.NET.Core;
 using Silk.NET.OpenXR;
 
 namespace Edrakon.Headsets;
@@ -85,9 +79,3 @@ public class MetaEyeTracker : IDisposable
 public delegate Result XrCreateEyeTrackerFB(Session session, ref EyeTrackerCreateInfoFB createInfo, ref EyeTrackerFB eyeTracker);
 public delegate Result XrDestroyEyeTrackerFB(EyeTrackerFB eyeTracker);
 public delegate Result XrGetEyeGazesFB(EyeTrackerFB eyeTracker, ref EyeGazesInfoFB gazeInfo, ref EyeGazesFB eyeGazes);
-
-
-public static class EyeTrackerHelpers
-{
-    public static bool SupportsEyeTracking(this XRInstance instance) => (Bool32)instance.GetRawProperty<SystemEyeTrackingPropertiesFB>().SupportsEyeTracking;
-}

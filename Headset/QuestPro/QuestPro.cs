@@ -11,27 +11,39 @@ using System.Net;
 using System.Numerics;
 using KoboldOSC.Messages;
 using Edrakon.Helpers;
+using Edrakon.Structs;
 
 namespace Edrakon.Headsets;
 
 
-public class QuestPro(int port) : Headset, IDisposable
+public class QuestPro(int port) : IDisposable
 {
-    public const string EYE_GAZE_EXTENSION      = "XR_EXT_eye_gaze_interaction";
+    public const string HEADSET_VERSION         = "0.0.1";
+    public const string HEADSET_APP_NAME        = "Quest Pro face & eye tracking bridge via Edrakon";
     public const string HEADLESS_EXTENSION      = "XR_MND_headless";
-    public const string FB_FACE_EXTENSION       = "XR_FB_face_tracking2";
     public const string TIMESPEC_EXTENSION      = "XR_KHR_convert_timespec_time";
+    public const string EYE_GAZE_EXTENSION      = "XR_EXT_eye_gaze_interaction";
+    public const string FB_FACE_EXTENSION       = "XR_FB_face_tracking2";
+    public const float  UPDATES_PER_SECOND      = 1000f;
+    public const float  UPDATES_DELAY           = 1f / UPDATES_PER_SECOND;
+    private string[] requiredExtensions         = [EYE_GAZE_EXTENSION, HEADLESS_EXTENSION, FB_FACE_EXTENSION, TIMESPEC_EXTENSION];
 
 
-    public readonly IPEndPoint TempEndpoint = new(IPAddress.Loopback, port);
-    public static readonly Version TargetOpenXRVersion = new(1, 0, 0);
-    public static readonly string AppName = "Quest Pro bridge via Edrakon";
-    public static readonly Version AppVersion = new(0, 0, 1);
+
+    public Action<object?, int>? Logger;
 
 
-    [AllowNull]    
+
+    public readonly IPEndPoint      TempEndpoint = new(IPAddress.Loopback, port);
+    public static readonly Version  TargetOpenXRVersion = new(1, 0, 0);
+    public static readonly string   AppName = "Quest Pro bridge via Edrakon";
+    public static readonly Version  AppVersion = new(0, 0, 1);
+
+
+
+    [AllowNull]
     private XRSession session;
-    
+
     [AllowNull]
     private XRInstance instance;
 
@@ -45,7 +57,6 @@ public class QuestPro(int port) : Headset, IDisposable
     private KOscSender sender;
 
 
-    private string[] requiredExtensions = [EYE_GAZE_EXTENSION, HEADLESS_EXTENSION, FB_FACE_EXTENSION, TIMESPEC_EXTENSION];
 
     [AllowNull]
     private SimpleXRWrapper wrapper;
@@ -53,15 +64,20 @@ public class QuestPro(int port) : Headset, IDisposable
     [AllowNull]
     private Task runTask;
 
+
+
     [AllowNull]
     private CancellationTokenSource tokenSource;
     private CancellationToken token;
+    private static readonly TimeSpan delay = TimeSpan.FromSeconds(UPDATES_DELAY);
     private bool disposed;
 
 
 
-    public override void Initialize()
+    public void Initialize()
     {
+        ThrowIfDisposed();
+
         Log("Initializing Quest Pro headset...");
 
         wrapper = new();
@@ -101,19 +117,21 @@ public class QuestPro(int port) : Headset, IDisposable
 
 
 
-    public override async Task Run()
+    public async Task Run()
     {
+        ThrowIfDisposed();
         Log("Starting Quest Pro face tracking bridge.");
         runTask = Task.Run(RunTask);
         await runTask;
     }
 
 
+
     private async Task RunTask()
     {
+        ThrowIfDisposed();
         for (;;)
         {
-            // Log("Task loop", LogLevel.DEBUG);
             if (token.IsCancellationRequested)
                 break;
 
@@ -122,13 +140,16 @@ public class QuestPro(int port) : Headset, IDisposable
 
             Serialize(sender, ref faceParams);
 
-            await Task.Delay(1);
+            await Task.Delay(delay);
         }
     }
 
 
+
     private void Serialize(KOscSender sender, ref MetaFaceInfo faceInfo)
     {
+        ThrowIfDisposed();
+
         #region Eye Look
         float leftX = faceInfo.FaceParameters.EyesLookLeftLFB - faceInfo.FaceParameters.EyesLookRightLFB;
         float leftY = faceInfo.FaceParameters.EyesLookUpLFB - faceInfo.FaceParameters.EyesLookDownLFB;
@@ -272,7 +293,6 @@ public class QuestPro(int port) : Headset, IDisposable
 
         
 
-
         KOscMessage eyesLookUpR = new("/sl/xrfb/facew/EyesLookUpR");
         eyesLookUpR.WriteFloat(faceInfo.FaceParameters.EyesLookUpRFB);
         KOscMessage innerBrowRaiserL = new("/sl/xrfb/facew/InnerBrowRaiserL");
@@ -335,8 +355,8 @@ public class QuestPro(int port) : Headset, IDisposable
             lipPressorL,
             lipPressorR,
             lipPuckerL);
-        
-        
+
+
 
         KOscMessage lipPuckerR = new("/sl/xrfb/facew/LipPuckerR");
         lipPuckerR.WriteFloat(faceInfo.FaceParameters.LipPuckerRFB);
@@ -440,7 +460,7 @@ public class QuestPro(int port) : Headset, IDisposable
     }
 
 
-    public override void Stop()
+    public void Stop()
     {
         Log("Shutting down Quest Pro face tracking bridge.");
         tokenSource.Cancel();
@@ -466,12 +486,18 @@ public class QuestPro(int port) : Headset, IDisposable
     }
 
 
+    public void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(disposed, this);
+
+
+    private void Log(object? message = null, int logLevel = 0) => Logger?.Invoke(message, logLevel);
+
+
     public void Dispose()
     {
         if (disposed)
             return;
-        
-        Log("Disposing of Quest Pro device.", LogLevel.DEBUG);
+
+        Log("Disposing of Quest Pro device.", 3);
         GC.SuppressFinalize(this);
         Stop();
 
@@ -480,34 +506,9 @@ public class QuestPro(int port) : Headset, IDisposable
         session.Dispose();
         instance.Dispose();
 
-        Log("Quest Pro device disposal success!", LogLevel.DEBUG);
+        Log("Quest Pro device disposal success!", 3);
     }
 }
-
-
-public abstract class Headset
-{
-    public Action<object?, int> LogEvent { get; set; }
-
-
-    public Headset()
-    {
-        LogEvent = (obj, level) => EdraLogger.Log(obj, (LogLevel)level);
-    }
-
-
-    /// <summary>
-    /// Initializes this headset device.
-    /// </summary>
-    /// <returns>True if initialization succeeded, otherwise false.</returns>
-    public abstract void Initialize();
-    public abstract Task Run();
-    public abstract void Stop();
-    protected void Log(object? message = null, LogLevel logLevel = LogLevel.INFO) => LogEvent?.Invoke(message, (int)logLevel);
-}
-
-
-public delegate void EdrakonLog(object? message = null, LogLevel logLevel = LogLevel.INFO);
 
 
 

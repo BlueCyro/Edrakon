@@ -1,11 +1,9 @@
 using System.Numerics;
-using System.Reflection;
 using Edrakon.Helpers;
 using KoboldOSC.Messages;
-using KoboldOSC.Structs;
 using Edrakon.Wrappers;
-using Silk.NET.Core;
 using Silk.NET.OpenXR;
+using Edrakon.Structs;
 
 namespace Edrakon.Headsets;
 
@@ -88,23 +86,6 @@ public class MetaFaceTracker : IDisposable
         xrDestroyFaceTracker2FB.Dispose();
         xrGetFaceExpressionWeights2FB.Dispose();
     }
-}
-
-
-public interface IParameterStruct
-{
-    public static abstract OSCInfo[] PathInfo { get; }
-    public static abstract int BundleCount { get; }
-}
-
-
-
-
-
-public readonly struct OSCInfo(OSCString path, int bundleId = -1)
-{
-    public readonly int BundleId;
-    public readonly OSCString path;
 }
 
 

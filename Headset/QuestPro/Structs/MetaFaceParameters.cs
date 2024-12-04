@@ -1,21 +1,7 @@
-using System.Numerics;
-using KoboldOSC;
-using KoboldOSC.Messages;
+namespace Edrakon.Structs;
 
-namespace Edrakon.Headsets;
-
-public struct MetaFaceParameters : IParameterStruct
+public readonly struct MetaFaceParameters
 {
-    public static OSCInfo[] PathInfo { get; }
-    public static int BundleCount { get; }
-
-    static MetaFaceParameters()
-    {
-        PathInfo = [];
-        BundleCount = 5;
-    }
-
-
     public readonly float BrowLowererLFB;
     public readonly float BrowLowererRFB;
     public readonly float CheekPuffLFB;
@@ -86,18 +72,4 @@ public struct MetaFaceParameters : IParameterStruct
     public readonly float TongueBackDorsalVelarFB;
     public readonly float TongueOutFB;
     public readonly float TongueRetreatFB;
-}
-
-
-public readonly struct MetaFaceInfo
-{
-    public readonly MetaFaceParameters FaceParameters;
-    public readonly MetaFaceConfidences FaceConfidences;
-}
-
-
-public readonly struct MetaFaceConfidences
-{
-    public readonly float Lower;
-    public readonly float Upper;
 }
