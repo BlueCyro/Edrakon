@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Edrakon.Wrapper;
 using Silk.NET.Core;
 using Silk.NET.OpenXR;
 

@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Edrakon.Helpers;
-using Edrakon.Wrapper;
 using Silk.NET.Core;
 using Silk.NET.OpenXR;
 
@@ -21,8 +20,8 @@ public class XRSystem
     public uint MaxSwapchainHeight => sysProps.GraphicsProperties.MaxSwapchainImageHeight;
 
 
-    internal SystemGetInfo sysInfo = XRStructHelper<SystemGetInfo>.Get();
-    internal SystemProperties sysProps = XRStructHelper<SystemProperties>.Get();
+    internal SystemGetInfo sysInfo = XRStructHelper.Get<SystemGetInfo>();
+    internal SystemProperties sysProps = XRStructHelper.Get<SystemProperties>();
     internal ulong sysID;
     internal readonly XRInstance instance;
 

@@ -3,14 +3,14 @@ using Edrakon.Helpers;
 using Edrakon.Wrappers;
 using Silk.NET.OpenXR;
 
-namespace Edrakon.Wrapper;
+namespace Edrakon.Wrappers;
 
 
 public abstract class XRPropertyBase<T> : IXRPropertyBase
     where T : unmanaged
 {
     public StructureType StructureType => Unsafe.As<T, StructureType>(ref properties);
-    protected unsafe T properties = XRStructHelper<T>.Get();
+    protected unsafe T properties = XRStructHelper.Get<T>();
     protected SystemProperties sysProps;
 
 

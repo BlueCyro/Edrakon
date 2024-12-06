@@ -16,7 +16,7 @@ public class XRSpace : IDisposable
     {
         XR = xr;
 
-        ReferenceSpaceCreateInfo spaceInfo = XRStructHelper<ReferenceSpaceCreateInfo>.Get();
+        ReferenceSpaceCreateInfo spaceInfo = XRStructHelper.Get<ReferenceSpaceCreateInfo>();
 
         Vector3f positionF = new(position.X, position.Y, position.Z);
         Quaternionf orientationF = new(orientation.X, orientation.Y, orientation.Z, orientation.W);
@@ -31,7 +31,7 @@ public class XRSpace : IDisposable
     {
         XR = xr;
 
-        ActionSpaceCreateInfo spaceInfo = XRStructHelper<ActionSpaceCreateInfo>.Get();
+        ActionSpaceCreateInfo spaceInfo = XRStructHelper.Get<ActionSpaceCreateInfo>();
 
         Vector3f positionF = new(position.X, position.Y, position.Z);
         Quaternionf orientationF = new(orientation.X, orientation.Y, orientation.Z, orientation.W);
@@ -54,7 +54,7 @@ public class XRSpace : IDisposable
 
     public SpaceLocation LocateSpace(XRSpace other, long time)
     {
-        SpaceLocation space = XRStructHelper<SpaceLocation>.Get();
+        SpaceLocation space = XRStructHelper.Get<SpaceLocation>();
         XR.LocateSpace(Space, other.Space, time, ref space).ThrowIfNotSuccess();
         return space;
     }

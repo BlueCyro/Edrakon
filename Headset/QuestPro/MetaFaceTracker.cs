@@ -23,7 +23,7 @@ public class MetaFaceTracker : IDisposable
 
     private FaceTracker2FB tracker;
     private MetaFaceInfo faceInfo;
-    private FaceExpressionInfo2FB expressionInfo = XRStructHelper<FaceExpressionInfo2FB>.Get();
+    private FaceExpressionInfo2FB expressionInfo = XRStructHelper.Get<FaceExpressionInfo2FB>();
 
 
     public MetaFaceTracker(XRInstance instance, XRSession session)
@@ -41,7 +41,7 @@ public class MetaFaceTracker : IDisposable
 
 
 
-        FaceTrackerCreateInfo2FB faceTrackerInfo = XRStructHelper<FaceTrackerCreateInfo2FB>.Get();
+        FaceTrackerCreateInfo2FB faceTrackerInfo = XRStructHelper.Get<FaceTrackerCreateInfo2FB>();
         FaceTrackingDataSource2FB dataSource = FaceTrackingDataSource2FB.VisualFB;  // Only support visual right now.
         faceTrackerInfo.FaceExpressionSet = ExpressionSet;                          // This is ALWAYS DefaultFB currently.
         faceTrackerInfo.RequestedDataSourceCount = 1;
@@ -54,7 +54,7 @@ public class MetaFaceTracker : IDisposable
     public ref MetaFaceInfo GetBlendshapes()
     {
         // Init expression weights
-        FaceExpressionWeights2FB expressionWeights = XRStructHelper<FaceExpressionWeights2FB>.Get();
+        FaceExpressionWeights2FB expressionWeights = XRStructHelper.Get<FaceExpressionWeights2FB>();
 
         // Set the weight count and confidence count.
         expressionWeights.WeightCount = (uint)ExpressionCount;

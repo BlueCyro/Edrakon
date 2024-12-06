@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Edrakon.Helpers;
 using Edrakon.Structs;
-using Edrakon.Wrapper;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.OpenXR;
@@ -95,7 +94,7 @@ public class XRInstance : IDisposable
 
     public unsafe void SuggestInteractionProfileBindings(string profile, XRActionSuggestedBinding[] bindings)
     {
-        InteractionProfileSuggestedBinding info = XRStructHelper<InteractionProfileSuggestedBinding>.Get();
+        InteractionProfileSuggestedBinding info = XRStructHelper.Get<InteractionProfileSuggestedBinding>();
 
 
         ActionSuggestedBinding* actionBindings = stackalloc ActionSuggestedBinding[bindings.Length];
