@@ -15,8 +15,6 @@ public class StructTypeGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        Helpers.WriteLine("HELLO");
-
         // context.RegisterPostInitializationOutput(ctx => ctx.AddSource("XRHelpers.g.cs", SourceText.From(Helpers.CreateLookups(), Encoding.UTF8)));
 
         context.SyntaxProvider.CreateSyntaxProvider(predicate: (c, _) => true, transform: (ctx, _) => true);
