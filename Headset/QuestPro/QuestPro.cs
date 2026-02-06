@@ -132,9 +132,9 @@ public class QuestPro(int port) : IDisposable
             if (token.IsCancellationRequested)
                 break;
 
-
             ref MetaFaceInfo faceParams = ref faceTracker.GetBlendshapes();
 
+            session.SyncActions(eyeTracker.Actions);
             Serialize(sender, ref faceParams);
 
             await Task.Delay(delay);
