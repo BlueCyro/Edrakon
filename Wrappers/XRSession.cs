@@ -74,6 +74,26 @@ public class XRSession : IDisposable
         }
     }
 
+    public unsafe void SyncActions(params Span<XRActionSet> actionSets)
+    {
+        ActionsSyncInfo syncInfo = XRStructHelper.Get<ActionsSyncInfo>();
+
+        Span<ActiveActionSet> sets = stackalloc ActiveActionSet[actionSets.Length];
+
+        for (int i = 0; i < actionSets.Length; i++)
+        {
+            sets[i].ActionSet = actionSets[i].actionSet;
+            sets[i].SubactionPath = 0;
+        }
+
+        fixed (ActiveActionSet* setsPtr = sets)
+        {
+            syncInfo.ActiveActionSets = setsPtr;
+            syncInfo.CountActiveActionSets = (uint)actionSets.Length;
+            XR.SyncAction(session, ref syncInfo);
+        }
+    }
+
     public ActionStatePose GetActionStatePose(XRAction<PosefAction> action, string? subPath = null)
     {
         ActionStateGetInfo getInfo = XRStructHelper.Get<ActionStateGetInfo>();
