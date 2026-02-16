@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -11,7 +11,15 @@
     <!-- <OptimizationPreference>Speed</OptimizationPreference> -->
     <!-- <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath> -->
+    <PublishSingleFile>true</PublishSingleFile>
     <InterceptorsPreviewNamespaces>Edrakon.Helpers</InterceptorsPreviewNamespaces>
+
+    <Version>1.0.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <Authors>Cyro</Authors>
+    <Product>Edrakon OpenXR Eye/Face tracking OSC bridge</Product>
+    <Description>Adapts OpenXR eye and face tracking data from the Quest Pro into SteamLink-formatted OSC data.</Description>
+    <Copyright>Copyright (c) 2026 Cyro</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

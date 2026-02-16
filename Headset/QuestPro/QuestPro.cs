@@ -46,7 +46,7 @@ public class QuestPro(int port) : IDisposable
 
     [AllowNull]
     private MetaEyeTracker eyeTracker;
-    
+
     [AllowNull]
     private MetaFaceTracker faceTracker;
 
@@ -101,7 +101,7 @@ public class QuestPro(int port) : IDisposable
         eyeTracker = new(instance, session);
         eyeTracker.Logger = (obj, level) => EdraLogger.Log(obj, (LogLevel)level);
         Log("Initialized eye tracker.");
-        
+
 
         Log($"Opening sender to endpoint: {TempEndpoint}");
         sender = new(TempEndpoint);
@@ -431,7 +431,7 @@ public class QuestPro(int port) : IDisposable
             upperLidRaiserR,
             upperLipRaiserL,
             upperLipRaiserR);
-        
+
         #endregion
 
         #region Bundle 5

@@ -36,7 +36,7 @@ public class Program
         // File.WriteAllBytes("../OSCTest.osc", dest);
 
         headset = new(args.Length > 0 ? int.Parse(args[0]) : 8000);
-        
+
 
         headset.Initialize();
 
@@ -53,7 +53,7 @@ public class Program
         for (;;)
         {
             EdraLogger.Log("Input event", LogLevel.DEBUG);
-            
+
             if (Console.ReadKey().Key == ConsoleKey.F)
             {
                 headset.Dispose();

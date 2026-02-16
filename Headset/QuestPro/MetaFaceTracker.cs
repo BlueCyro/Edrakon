@@ -75,7 +75,7 @@ public class MetaFaceTracker : IDisposable
         return ref faceInfo;
     }
 
-    
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);
