@@ -152,7 +152,7 @@ public class QuestPro(int port) : IDisposable
         float leftX = faceInfo.FaceParameters.EyesLookLeftLFB - faceInfo.FaceParameters.EyesLookRightLFB;
         float leftY = faceInfo.FaceParameters.EyesLookUpLFB - faceInfo.FaceParameters.EyesLookDownLFB;
         float rightX = faceInfo.FaceParameters.EyesLookLeftRFB - faceInfo.FaceParameters.EyesLookRightRFB;
-        float rightY = faceInfo.FaceParameters.EyesLookUpRFB + faceInfo.FaceParameters.EyesLookDownRFB;
+        float rightY = faceInfo.FaceParameters.EyesLookUpRFB - faceInfo.FaceParameters.EyesLookDownRFB;
 
         eyeTracker.GetEyeGazes(out Posef gazePose);
 
